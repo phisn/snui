@@ -8,8 +8,7 @@ void WINAPI ServiceControl(DWORD dwControl)
 	switch (dwControl)
 	{
 	case SERVICE_CONTROL_STOP:
-		Configuration::Running = false;
-		NotifyRunningChanged();
+		SnsvStop();
 		
 		break;
 	case SERVICE_CONTROL_INTERROGATE:
