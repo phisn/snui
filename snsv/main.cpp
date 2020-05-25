@@ -1,17 +1,6 @@
-#define WIN32_LEAN_AND_MEAN
-
-#include <Windows.h>
-#include <WinSock2.h>
-
-#pragma comment(lib, "ws2_32.lib")
+#include "servicemain.h"
 
 #include <iostream>
-
-void WINAPI ServiceMain(
-	unsigned long dwNumServicesArgs,
-	wchar_t** lpServiceArgVectors)
-{
-}
 
 void printUsage(wchar_t* filename)
 {
@@ -47,10 +36,13 @@ int wmain(int argc, wchar_t* argv[])
 		int result = GetLastError();
 		if (result != ERROR_FAILED_SERVICE_CONTROLLER_CONNECT)
 		{
+			ReportWindowsError(L"Failed to start service control dispatcher");
 			return result;
 		}
 
 		printUsage(argv[0]);
 		return -1;
 	}
+
+	return 0;
 }

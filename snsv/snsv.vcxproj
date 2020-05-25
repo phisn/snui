@@ -140,6 +140,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="servicemain.cpp" />
+    <ClCompile Include="snortnotify.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="servicemain.h" />
+    <ClInclude Include="snortnotify.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -9,5 +9,19 @@
     <ClCompile Include="main.cpp">
       <Filter>source</Filter>
     </ClCompile>
+    <ClCompile Include="servicemain.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="snortnotify.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="servicemain.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="snortnotify.h">
+      <Filter>source</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
