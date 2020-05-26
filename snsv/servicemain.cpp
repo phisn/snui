@@ -1,3 +1,4 @@
+#include "Common.h"
 #include "servicemain.h"
 #include "snortnotify.h"
 
@@ -41,7 +42,7 @@ void WINAPI ServiceMain(
 	wchar_t** argv)
 {
 	SERVICE_STATUS_HANDLE serviceControl = RegisterServiceCtrlHandlerW(
-		L"snsv",
+		SNUI_SERVICE_NAME,
 		ServiceControl);
 
 	if (!serviceControl)
@@ -54,6 +55,7 @@ void WINAPI ServiceMain(
 	status.dwCurrentState = SERVICE_START_PENDING;
 	status.dwWin32ExitCode = NO_ERROR;
 	status.dwWaitHint = 500;
+	status.dwServiceType = SERVICE_WIN32_OWN_PROCESS;
 
 	if (!EnforceServiceStatus(serviceControl, &status))
 	{
@@ -108,7 +110,7 @@ void ReportNumericError(const wchar_t* message, int error)
 
 void ReportMessages(const wchar_t** messages, int messageCount)
 {
-	HANDLE source = RegisterEventSourceW(NULL, L"snsv");
+	HANDLE source = RegisterEventSourceW(NULL, SNUI_SERVICE_NAME);
 	
 	if (source)
 	{

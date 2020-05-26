@@ -5,4 +5,9 @@
       <UniqueIdentifier>{313a92ed-dc94-414a-b8d7-5d1dfa55e4be}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Common.h">
+      <Filter>source</Filter>
+    </ClInclude>
+  </ItemGroup>
 </Project>

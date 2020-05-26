@@ -15,7 +15,7 @@ namespace Configuration
 bool SnsvInitialize()
 {
 	int result = WSAStartup(MAKEWORD(2, 2), &winsockData);
-	if (!result)
+	if (result)
 	{
 		ReportNumericError(L"WSAStartup failed", result);
 		return false;
@@ -48,8 +48,10 @@ void SnsvRun()
 {
 	while (running)
 	{
-
+		Sleep(500);
 	}
+
+	closesocket(listenSocket);
 }
 
 void SnsvStop()
