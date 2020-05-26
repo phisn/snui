@@ -9,5 +9,8 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)Common.h">
       <Filter>source</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)FastAlert.h">
+      <Filter>source</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
