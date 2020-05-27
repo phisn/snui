@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="source">
+      <UniqueIdentifier>{e3dd6a12-1723-4b08-9836-5a6d7df8d89d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="imgui.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui_draw.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui_widgets.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui_impl_glfw.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui_impl_opengl2.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="imgui.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="imstb_truetype.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="imstb_textedit.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="imstb_rectpack.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui_internal.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="imconfig.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui_impl_glfw.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui_impl_opengl2.h">
+      <Filter>source</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

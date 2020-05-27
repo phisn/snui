@@ -1,18 +1,17 @@
+#ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
+#endif
 
 #include "Common.h"
-#include "FastAlert.h"
+#include "configuration.h"
+#include "nui.h"
 
 #include <Windows.h>
+#include <shellapi.h>
 
 #include <cassert>
 #include <iostream>
-
-namespace Configuration
-{
-	std::string alertPath;
-	int refreshRate;
-}
+#include <string>
 
 void PrintUsage(char* filename)
 {
@@ -24,18 +23,19 @@ void PrintUsage(char* filename)
 		<< "Options:\n"
 		<< "       -p        snort alert_fast path\n"
 		<< "       -r [1000] refresh rate for alert checking\n"
+		<< "       -h        hides console window\n"
 		<< std::endl;
 }
 
-int MakeAdvancedPath(
+bool MakeAdvancedPath(
 	char* path,
 	int argc,
 	char* argv[])
 {
 	if (!GetModuleFileNameA(NULL, path, MAX_PATH))
 	{
-		std::cout << "Failed to aquire path (" << GetLastError() << ")" << std::endl;
-		return GetLastError();
+		std::cerr << "Failed to aquire path (" << GetLastError() << ")" << std::endl;
+		return false;
 	}
 
 	int position = strlen(path);
@@ -45,14 +45,14 @@ int MakeAdvancedPath(
 
 		if (result < 0)
 		{
-			std::cout << "Failed to create path (" << result << ")" << std::endl;
-			return -3;
+			std::cerr << "Failed to create path (" << result << ")" << std::endl;
+			return false;
 		}
 
 		position += result;
 	}
 
-	return 0;
+	return true;
 }
 
 bool HandleInstall(int argc, char* argv[]);
@@ -76,18 +76,20 @@ bool HandleArguments(int argc, char* argv[])
 		if (argc > 2)
 		{
 			PrintUsage(argv[0]);
-			std::cout << "Invalid number of arguments" << std::endl;
+			std::cerr << "Invalid number of arguments" << std::endl;
 			return false;
 		}
 
 		return HandleUninstall();
 	}
 
+	Configuration::hideConsole = false;
+
 	for (int i = 1; i < argc; ++i)
 	{
 		if (argv[i][0] != '-')
 		{
-			std::cout << "Got invalid argument" << std::endl;
+			std::cerr << "Got invalid argument" << std::endl;
 			return false;
 		}
 
@@ -107,18 +109,22 @@ bool HandleArguments(int argc, char* argv[])
 			}
 
 			break;
+		case 'h':
+			Configuration::hideConsole = true;
+
+			break;
 		}
 
 		if (i == argc)
 		{
-			std::cout << "Got invalid number of arguments" << std::endl;
+			std::cerr << "Got invalid number of arguments" << std::endl;
 			return false;
 		}
 	}
 
 	if (Configuration::alertPath.size() == 0)
 	{
-		std::cout << "FastAlert path missing" << std::endl;
+		std::cerr << "FastAlert path missing" << std::endl;
 		return false;
 	}
 
@@ -139,6 +145,11 @@ int main(int argc, char* argv[])
 
 	std::cout << "Started listening to " << Configuration::alertPath.c_str() << " at " << Configuration::refreshRate << std::endl;
 
+	if (Configuration::hideConsole)
+	{
+		ShowWindow(::GetConsoleWindow(), SW_HIDE);
+	}
+
 	HANDLE alertFile = CreateFileA(
 		Configuration::alertPath.c_str(),
 		GENERIC_READ,
@@ -150,15 +161,20 @@ int main(int argc, char* argv[])
 		NULL);
 	if (alertFile == INVALID_HANDLE_VALUE)
 	{
-		std::cout << "Failed to open alert file (" << GetLastError() << ")" << std::endl;
+		std::cerr << "Failed to open alert file (" << GetLastError() << ")" << std::endl;
 		return -3;
 	}
 
 	LARGE_INTEGER lastFileSize;
 	if (!GetFileSizeEx(alertFile, &lastFileSize))
 	{
-		std::cout << "Failed to get initial filetime (" << GetLastError() << ")" << std::endl;
+		std::cerr << "Failed to get initial filetime (" << GetLastError() << ")" << std::endl;
 		return -4;
+	}
+
+	if (!nui::initialize())
+	{
+		return -5;
 	}
 
 	while (true)
@@ -168,13 +184,14 @@ int main(int argc, char* argv[])
 		LARGE_INTEGER fileSize;
 		if (!GetFileSizeEx(alertFile, &fileSize))
 		{
-			std::cout << "Failed to get filetime (" << GetLastError() << ")" << std::endl;
-			return -6;
+			std::cerr << "Failed to get filetime (" << GetLastError() << ")" << std::endl;
+			return -7;
 		}
 
 		if (fileSize.QuadPart != lastFileSize.QuadPart)
 		{
-
+			if (!nui::notify())
+				return -8;
 
 			lastFileSize = fileSize;
 		}
@@ -189,6 +206,13 @@ bool HandleInstall(int argc, char* argv[])
 		return false;
 	}
 
+	errno_t catResult = strcat_s(path, " -h");
+	if (catResult)
+	{
+		std::cerr << "Failed to create path (" << catResult << ")" << std::endl;
+		return false;
+	}
+
 	HKEY autorunKey;
 	LSTATUS result = RegCreateKeyExA(
 		HKEY_CURRENT_USER,
@@ -200,7 +224,7 @@ bool HandleInstall(int argc, char* argv[])
 		NULL);
 	if (result != ERROR_SUCCESS)
 	{
-		std::cout << "Failed to create registry key (" << result << ")" << std::endl;
+		std::cerr << "Failed to create registry key (" << result << ")" << std::endl;
 		return false;
 	}
 
@@ -216,12 +240,12 @@ bool HandleInstall(int argc, char* argv[])
 
 	if (result != ERROR_SUCCESS)
 	{
-		std::cout << "Failed to change registry key (" << result << ")" << std::endl;
+		std::cerr << "Failed to change registry key (" << result << ")" << std::endl;
 		return false;
 	}
 
 	std::cout << "Successfully installed" << std::endl;
-	Configuration::alertPath = argv[2];
+	system(path);
 
 	return true;
 }
@@ -238,7 +262,7 @@ bool HandleUninstall()
 		&autorunKey);
 	if (result != ERROR_SUCCESS)
 	{
-		std::cout << "Failed to open registry key (" << result << ")" << std::endl;
+		std::cerr << "Failed to open registry key (" << result << ")" << std::endl;
 		return false;
 	}
 
@@ -247,7 +271,7 @@ bool HandleUninstall()
 		SNUI_APP_NAME);
 	if (result != ERROR_SUCCESS)
 	{
-		std::cout << "Failed to delete registry value (" << result << ")" << std::endl;
+		std::cerr << "Failed to delete registry value (" << result << ")" << std::endl;
 		return false;
 	}
 
