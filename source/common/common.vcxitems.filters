@@ -6,7 +6,11 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="$(MSBuildThisFileDirectory)common.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)fastalert.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)fastalert.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)common.h">
+      <Filter>source</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
