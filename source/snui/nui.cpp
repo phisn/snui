@@ -109,6 +109,7 @@ namespace nui
 				glfwSwapBuffers(window);
 			}
 
+			app.notifyClose();
 			glfwSetWindowShouldClose(window, GLFW_FALSE);
 		}
 
