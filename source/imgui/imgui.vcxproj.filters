@@ -21,6 +21,9 @@
     <ClCompile Include="imgui_impl_opengl2.cpp">
       <Filter>source</Filter>
     </ClCompile>
+    <ClCompile Include="imgui_stdlib.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui.h">
@@ -45,6 +48,9 @@
       <Filter>source</Filter>
     </ClInclude>
     <ClInclude Include="imgui_impl_opengl2.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui_stdlib.h">
       <Filter>source</Filter>
     </ClInclude>
   </ItemGroup>

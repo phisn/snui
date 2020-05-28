@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="source">
+      <UniqueIdentifier>{424b4fed-5dc1-41e3-9454-b367bcac667a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="external">
+      <UniqueIdentifier>{e71e72c9-a920-4a47-86a7-156ca691ce31}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="external\snui">
+      <UniqueIdentifier>{6fa800b9-7f48-451b-bfff-ac7e0b249af9}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\snui\nuiapp.cpp">
+      <Filter>external\snui</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\snui\nuiapp.h">
+      <Filter>external\snui</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

@@ -1,5 +1,6 @@
-#include "Common.h"
+#include "common.h"
 #include "configuration.h"
+#include "logger.h"
 #include "nui.h"
 #include "nuiapp.h"
 
@@ -32,8 +33,8 @@ namespace nui
 {
 	static void glfw_error_callback(int error, const char* description)
 	{
-		std::cerr << "glfw failed (" << error << "): " << description;
-		exit(-507);
+		NumLogMessage(description, error);
+		exit(-1);
 	}
 
 	void snui_main(std::promise<bool>* initPromise)
@@ -135,7 +136,7 @@ namespace nui
 
 		if (!alertFile)
 		{
-			std::cerr << "Open alert file failed: " << strerror(errno) << std::endl;
+			NumLogMessage("Open alert file failed", errno);
 			return false;
 		}
 
@@ -162,13 +163,13 @@ namespace nui
 		
 		if (!alertFile)
 		{
-			std::cerr << "Reverse read alert file failed: " << strerror(errno) << std::endl;
+			NumLogMessage("Reverse read alert file failed", errno);
 			return false;
 		}
 
 		if (!std::getline(alertFile, line))
 		{
-			std::cerr << "Read alert file failed: " << strerror(errno) << std::endl;
+			NumLogMessage("Read alert file failed", errno);
 			return false;
 		}
 

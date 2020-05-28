@@ -2,12 +2,14 @@
 #define WIN32_LEAN_AND_MEAN
 #endif
 
-#include "Common.h"
+#include "common.h"
 #include "configuration.h"
+#include "logger.h"
 #include "nui.h"
 
 #include <Windows.h>
 #include <shellapi.h>
+#include <TlHelp32.h>
 
 #include <cassert>
 #include <iostream>
@@ -34,18 +36,18 @@ bool MakeAdvancedPath(
 {
 	if (!GetModuleFileNameA(NULL, path, MAX_PATH))
 	{
-		std::cerr << "Failed to aquire path (" << GetLastError() << ")" << std::endl;
+		WinLogMessage("Failed to aquire path");
 		return false;
 	}
 
-	int position = strlen(path);
+	size_t position = strlen(path);
 	for (int i = 0; i < argc; ++i)
 	{
 		int result = snprintf(path + position, MAX_PATH - position, " %s", argv[i]);
 
 		if (result < 0)
 		{
-			std::cerr << "Failed to create path (" << result << ")" << std::endl;
+			NumLogMessage("Failed to create path", result);
 			return false;
 		}
 
@@ -76,7 +78,7 @@ bool HandleArguments(int argc, char* argv[])
 		if (argc > 2)
 		{
 			PrintUsage(argv[0]);
-			std::cerr << "Invalid number of arguments" << std::endl;
+			LogMessage("Invalid number of arguments");
 			return false;
 		}
 
@@ -89,7 +91,7 @@ bool HandleArguments(int argc, char* argv[])
 	{
 		if (argv[i][0] != '-')
 		{
-			std::cerr << "Got invalid argument" << std::endl;
+			LogMessage("Got invalid argument");
 			return false;
 		}
 
@@ -117,14 +119,14 @@ bool HandleArguments(int argc, char* argv[])
 
 		if (i == argc)
 		{
-			std::cerr << "Got invalid number of arguments" << std::endl;
+			LogMessage("Got invalid number of arguments");
 			return false;
 		}
 	}
 
 	if (Configuration::alertPath.size() == 0)
 	{
-		std::cerr << "FastAlert path missing" << std::endl;
+		LogMessage("FastAlert path missing");
 		return false;
 	}
 
@@ -161,20 +163,20 @@ int main(int argc, char* argv[])
 		NULL);
 	if (alertFile == INVALID_HANDLE_VALUE)
 	{
-		std::cerr << "Failed to open alert file (" << GetLastError() << ")" << std::endl;
-		return -3;
+		WinLogMessage("Failed to open alert file");
+		return 1;
 	}
 
 	LARGE_INTEGER lastFileSize;
 	if (!GetFileSizeEx(alertFile, &lastFileSize))
 	{
-		std::cerr << "Failed to get initial filetime (" << GetLastError() << ")" << std::endl;
-		return -4;
+		WinLogMessage("Failed to get initial filetime");
+		return 1;
 	}
 
 	if (!nui::initialize())
 	{
-		return -5;
+		return 1;
 	}
 
 	while (true)
@@ -184,14 +186,14 @@ int main(int argc, char* argv[])
 		LARGE_INTEGER fileSize;
 		if (!GetFileSizeEx(alertFile, &fileSize))
 		{
-			std::cerr << "Failed to get filetime (" << GetLastError() << ")" << std::endl;
-			return -7;
+			WinLogMessage("Failed to get filetime");
+			return 1;
 		}
 
 		if (fileSize.QuadPart != lastFileSize.QuadPart)
 		{
 			if (!nui::notify())
-				return -8;
+				return 1;
 
 			lastFileSize = fileSize;
 		}
@@ -209,7 +211,7 @@ bool HandleInstall(int argc, char* argv[])
 	errno_t catResult = strcat_s(path, " -h");
 	if (catResult)
 	{
-		std::cerr << "Failed to create path (" << catResult << ")" << std::endl;
+		NumLogMessage("Failed to create path", catResult);
 		return false;
 	}
 
@@ -224,7 +226,7 @@ bool HandleInstall(int argc, char* argv[])
 		NULL);
 	if (result != ERROR_SUCCESS)
 	{
-		std::cerr << "Failed to create registry key (" << result << ")" << std::endl;
+		NumLogMessage("Failed to create registry key", result);
 		return false;
 	}
 
@@ -233,14 +235,14 @@ bool HandleInstall(int argc, char* argv[])
 		SNUI_APP_NAME,
 		0,
 		REG_SZ,
-		(BYTE*)path,
-		strlen(path));
+		(BYTE*) path,
+		(DWORD) strlen(path));
 
 	RegCloseKey(autorunKey);
 
 	if (result != ERROR_SUCCESS)
 	{
-		std::cerr << "Failed to change registry key (" << result << ")" << std::endl;
+		NumLogMessage("Failed to change registry key", result);
 		return false;
 	}
 
@@ -252,7 +254,17 @@ bool HandleInstall(int argc, char* argv[])
 
 bool HandleUninstall()
 {
+	HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, NULL);
+	if (snapshot == INVALID_HANDLE_VALUE)
+	{
+		WinLogMessage("Failed to aquire process list");
+		return false;
+	}
+
+
+
 	// find process
+
 	// kill process
 
 	HKEY autorunKey;
@@ -262,7 +274,7 @@ bool HandleUninstall()
 		&autorunKey);
 	if (result != ERROR_SUCCESS)
 	{
-		std::cerr << "Failed to open registry key (" << result << ")" << std::endl;
+		NumLogMessage("Failed to open registry key", result);
 		return false;
 	}
 
@@ -271,7 +283,7 @@ bool HandleUninstall()
 		SNUI_APP_NAME);
 	if (result != ERROR_SUCCESS)
 	{
-		std::cerr << "Failed to delete registry value (" << result << ")" << std::endl;
+		NumLogMessage("Failed to delete registry value", result);
 		return false;
 	}
 

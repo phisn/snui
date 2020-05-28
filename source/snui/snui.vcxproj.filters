@@ -18,6 +18,9 @@
     <ClCompile Include="nuiapp.cpp">
       <Filter>source</Filter>
     </ClCompile>
+    <ClCompile Include="logger.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="configuration.h">
@@ -27,6 +30,9 @@
       <Filter>source</Filter>
     </ClInclude>
     <ClInclude Include="nuiapp.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="logger.h">
       <Filter>source</Filter>
     </ClInclude>
   </ItemGroup>
